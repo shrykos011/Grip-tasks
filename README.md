@@ -1,0 +1,1 @@
+# shrykos.github.io
