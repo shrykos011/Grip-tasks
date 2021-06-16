@@ -1,0 +1,87 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Jun 15 10:04:49 2021
+
+@author: aksha
+"""
+
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_absolute_error
+from sklearn.metrics import mean_squared_error
+from sklearn.metrics import r2_score
+from sklearn import metrics
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+
+sample_data = pd.read_csv("studentmarks.csv")
+print("Data import successful")
+print(sample_data.head())
+
+sample_data.describe() #Data Description
+sample_data.info() #Info of Dataset
+sample_data.shape #To find the shape of data
+
+# Plotting the distribution of scores
+font1 = {'family':'Calibri','color':'blue','size':20}
+font2 = {'family':'serif','color':'darkred','size':15}
+sample_data.plot(x='Hours', y='Scores', style='o')  
+plt.title('Hours vs Percentage')  
+plt.xlabel('Hours Studied')  
+plt.ylabel('Percentage Score')  
+plt.show()
+
+x = sample_data.iloc[:, :-1].values  
+y = sample_data.iloc[:, 1].values
+
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=0)
+print('Splitting complete.')
+
+regressor = LinearRegression()  
+regressor.fit(x_train.reshape(-1,1), y_train) 
+print("Training complete.")
+
+
+
+print('Intercept value is:',regressor.intercept_)
+print('Linear coefficient is:',regressor.coef_)
+line = regressor.coef_*x+regressor.intercept_
+
+# Plotting for the test data
+plt.scatter(x, y)
+plt.title('Linear Regression vs trained model',fontdict=font1)
+plt.xlabel('Hours studied',fontdict=font2)
+plt.ylabel('Score obtained',fontdict=font2)
+plt.plot(x, line,color='red');
+plt.show()
+
+print("Training Score: ",regressor.score(x_train,y_train)*100)
+
+
+# Testing data
+print(x_test) # In Hours
+# Model Prediction 
+y_pred = regressor.predict(x_test) 
+# Predicting the scores
+print(y_pred)
+
+
+#Estimating training and test score
+print("Training Score:",regressor.score(x_train,y_train))
+print("Test Score:",regressor.score(x_test,y_test))
+
+hours = 9.25
+test = np.array([hours])
+test = test.reshape(-1, 1)
+pred = regressor.predict(test)
+print("Score obtained by the student if he studies for 9.25 hours/day = {}".format(pred[0]))
+
+
+print('Mean Absolute Error:',metrics.mean_absolute_error(y_test, y_pred)) # Mean_absolute_error
+print('Mean Squared Error:', metrics.mean_squared_error(y_test, y_pred)) # Mean_squared_error ( MSE Value)
+print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_pred))) # Mean_squared_error ( RMSE Value)
+print('R-2:', metrics.r2_score(y_test, y_pred)) #R2_Score
+print("Slope of regression line ",regressor.coef_)
+print("Y intercept of regression line",regressor.intercept_)
